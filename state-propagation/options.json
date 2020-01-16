@@ -1,0 +1,60 @@
+{
+  "cluster_params" : {
+     "job-name"        : "example_2D",
+     "requeue"         : false,
+     "partition"       : "day",
+     "ntasks"          : "5",
+     "cpus-per-task"   : "1",
+     "mem-per-cpu"     : "300M",
+     "time"            : "00:30:00",
+     "mail-type"       : "all",
+     "mail-user"       : "oskari.timgren@yale.edu",
+     "prog"            : "/home/fas/demille/omt3/project/"
+  },
+  "H_fname"       : "/home/fas/demille/omt3/project/State-evolution/matrices/H3.npy",
+  "E_t": [
+     "Ex0/2 * (np.tanh((t-t0)/tau) - np.tanh((t-t1)/tau))",
+     "Ey0/2 * (np.tanh((t-t0)/tau) - np.tanh((t-t1)/tau))",
+     "Ez0"
+     ],
+  
+  "E_params": {
+  "tau" : 2.5e-4,
+  "Ey0" : 0
+  },
+  
+  "B0" : [0, 0, 0.5],
+  "B_t": "(np.array(B0) * 1/2 * (2 + f*(-np.tanh((t-t0+deltat/2)/tau) + np.tanh((t-t0-deltat/2)/tau) 
+          -np.tanh((t-t1+deltat/2)/tau) + np.tanh((t-t1-deltat/2)/tau) )))",          
+  "scan_param"    : "Ez0",
+  "scan_range": {
+    "start"       : 0,
+    "stop"        : 450,
+    "num"         : 100
+  },
+  "scan_param2"   : "Ex0",
+  "scan_range2": {
+    "start"       : 0e3,
+    "stop"        : 30e3,
+    "num"         : 30
+  },
+  "fixed_params": {
+    "DCi"         : 500,
+    "DCslope"     : 2.75e8,
+    "deltaT"      : 2e-6
+  },
+  "units": {
+    "ACi"         : "V/cm",
+    "ACw"         : "Hz",
+    "DCi"         : "V/cm",
+    "DCslope"     : "V/cm/s",
+    "deltaT"      : "s"
+  },
+  "time_params": {
+    "num_segm"    : "int(3*DCi/DCslope*ACw/(2*np.pi)/2)",
+    "t_final"     : "2 * DCi / DCslope",
+    "segm_pts"    : "0.01 * (DCslope*(T1-T0) + ACi*ACw*DCi/DCslope/np.pi)",
+    "batch_size"  : 1
+  },
+  "state_fname"     : "" 
+}
