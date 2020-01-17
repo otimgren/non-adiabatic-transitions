@@ -39,6 +39,7 @@ def generate_batchfile(options_dict):
         print("#SBATCH --output \""        + run_dir+"/slurm/slurm-%j.out"+"\"", file=f)
         print("#SBATCH --error \""         + run_dir+"/slurm/slurm-%j.out"+"\"", file=f)
         print("\nmodule load miniconda", file=f)
+        print("conda init bash", file=f)
         print("conda activate non_adiabatic", file=f)
         exec_str =  ("python " + cluster_params["prog"] + " "
                         + run_dir + " " + options_fname + " " + options_dict["result_fname"])
