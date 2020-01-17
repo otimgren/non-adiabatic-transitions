@@ -53,9 +53,9 @@ def make_hamiltonian(path, c1 = 126030.0, c2 = 17890.0,
             for H_name, H_fn in lambdified_hamiltonians.items()
             }
         
-        Ham = lambda Ex,Ey,Ez,Bx,By,Bz: H["Hff"] + \
-            Ex*H["HSx"]  + Ey*H["HSy"] + Ez*H["HSz"] + \
-            Bx*H["HZx"]  + By*H["HZy"] + Bz*H["HZz"]
+        Ham = lambda E,B: H["Hff"] + \
+            E[0]*H["HSx"]  + E[1]*H["HSy"] + E[2]*H["HSz"] + \
+            B[0]*H["HZx"]  + B[1]*H["HZy"] + B[2]*H["HZz"]
 
         return Ham
 
