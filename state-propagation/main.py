@@ -5,7 +5,6 @@ Created on Thu Jan 16 20:32:49 2020
 @author: Oskari
 """
 
-from state_propagation_functions import *
 import argparse
 import json
 import pickle
@@ -51,6 +50,8 @@ def generate_batchfile(options_dict):
 def run_scan(options_dict):
     #Record start time
     start = time.time()
+    from state_propagation_functions import *
+
     
     #Generate list of quantum numbers
     QN = generate_QN()
