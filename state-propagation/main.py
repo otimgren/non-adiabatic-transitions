@@ -10,6 +10,7 @@ import json
 import pickle
 import time
 import os, sys
+from state_propagation_functions import *
 
 def generate_batchfile(options_dict):
     """
@@ -50,7 +51,7 @@ def generate_batchfile(options_dict):
 def run_scan(options_dict):
     #Record start time
     start = time.time()
-    from state_propagation_functions import *
+    
 
     
     #Generate list of quantum numbers
