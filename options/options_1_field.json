@@ -1,16 +1,17 @@
 {
   "cluster_params" : {
-     "job-name"        : "example_2D",
+     "job-name"        : "speed_test",
      "requeue"         : false,
      "partition"       : "day",
-     "ntasks"          : "5",
-     "cpus-per-task"   : "1",
+     "ntasks"          : "1",
+     "cpus-per-task"   : "10",
      "mem-per-cpu"     : "300M",
      "time"            : "00:30:00",
      "mail-type"       : "all",
      "mail-user"       : "oskari.timgren@yale.edu",
      "prog"            : "/home/fas/demille/omt3/project/"
   },
+  "batch_fname" : "test.sh", 
   "H_fname" : "/state-propagation/TlF_X_state_hamiltonians_symbolic.py",
   "E_t": [
      "Ex0/2 * (sp.tanh((t-t0)/tau) - sp.tanh((t-t1)/tau))",
@@ -47,7 +48,7 @@
 
   },
   "time_params": {
-    "N_steps" : 20e3
+    "N_steps" : 1e2
   },
   "state_fname"     : "/state-propagation/lens_state.pickle" 
 }
