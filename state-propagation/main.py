@@ -24,7 +24,7 @@ def generate_batchfile(options_dict):
     
     #Open file and write job submission options to it
     with open(batch_fname,'w') as f:
-        print("#!/bin/bash", file=f)
+        print("#!/bin/bash", file = f)
         if cluster_params["requeue"]:
            print("#SBATCH --requeue", file=f)
         
@@ -39,7 +39,7 @@ def generate_batchfile(options_dict):
         print("#SBATCH --output \""        + run_dir+"/slurm/slurm-%j.out"+"\"", file=f)
         print("#SBATCH --error \""         + run_dir+"/slurm/slurm-%j.out"+"\"", file=f)
         print("module load Python/3.6.4-foss-2018a", file=f)
-        exec_str =  ("python3 " + cluster_params["prog"] + " " +
+        exec_str =  ("python3 " + cluster_params["prog"] + " "
                         + run_dir + " " + options_fname)
         print(exec_str, file=f)
     print(f"Generated batch file: {batch_fname}")
