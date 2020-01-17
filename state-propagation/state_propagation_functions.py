@@ -5,14 +5,6 @@ Created on Thu Jan 16 15:45:47 2020
 @author: Oskari
 """
 
-import sys
-sys.path.append('../molecular-state-classes-and-functions/')
-
-#Import custom functions and classes used to manipulate molecular states and Hamiltonian
-from functions import *
-from classes import *
-from quantum_operators import *
-
 import numpy as np
 from scipy.linalg import expm
 
@@ -22,6 +14,14 @@ from sympy.utilities.lambdify import lambdify
 import sympy as sp
 
 from tqdm import tqdm
+
+import sys
+sys.path.append('../molecular-state-classes-and-functions/')
+
+#Import custom functions and classes used to manipulate molecular states and Hamiltonian
+from functions import *
+from classes import *
+from quantum_operators import *
 #%%Define functions
 
 def propagate_state(lens_state_vec, H, QN, B, E, T, N_steps):
