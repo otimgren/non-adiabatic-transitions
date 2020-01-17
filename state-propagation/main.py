@@ -41,7 +41,7 @@ def generate_batchfile(options_dict):
         print("\nmodule load miniconda\n", file=f)
         print("source activate non_adiabatic\n", file=f)
         exec_str =  ("python " + cluster_params["prog"] + " "
-                        + run_dir + " " + options_fname)
+                        + run_dir + " " + options_fname + options_dict["results_fname"])
         print(exec_str, file=f)
     print(f"Generated batch file: {batch_fname}")
     return batch_fname
@@ -98,6 +98,7 @@ if __name__ == "__main__":
     #Add run directory and options filename to options_dict
     options_dict["run_dir"] = args.run_dir
     options_dict["options_fname"] = args.options_fname
+    options_dict["results_fname"] = args.results_fname
         
     #Generate a batch file and submit to cluster
     if args.submit:
@@ -105,7 +106,7 @@ if __name__ == "__main__":
         os.system(f"sbatch {batch_fname}")
         
     #If this program isn't used for submitting, it is used to run the scan
-    else: 
+    else:
         probability, time_elapsed = run_scan(options_dict)
         
         with open(args.run_dir+'/results/'+args.result_fname,'w') as f:
