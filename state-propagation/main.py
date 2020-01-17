@@ -78,9 +78,6 @@ def run_scan(options_dict):
     
     return probability, time_elapsed
     
-    
-
-
 
 if __name__ == "__main__":
     #Get arguments from command line and parse them
