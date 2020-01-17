@@ -4,7 +4,7 @@ Created on Thu Jan 16 20:32:49 2020
 
 @author: Oskari
 """
-
+import numpy as np
 import argparse
 import json
 import pickle
