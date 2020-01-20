@@ -11,77 +11,142 @@ import pickle
 import time
 import os, sys
 from state_propagation_functions import *
+from datetime import datetime
+
+
+def generate_jobs_file(options_dict):
+    """
+    This is a function that generates a text file with the command line arguments
+    to run jobs using "dead Simple Queue" (dSQ) on the Yale HPC cluster.
+    
+    input on command line:
+    run_dir = path to directory in which the code is run
+    options_fname = path to options file that specifies parameters for the jobs
+    jobs_fname = path to output file that is used to with dSQ to generate a jobs array
+    
+    output:
+    a text file containing the commands needed to submit jobs to cluster using dSQ
+    """
+    #Get some parameters from options_dict 
+    cluster_params = options_dict["cluster_params"]
+    run_dir = options_dict["run_dir"]
+    jobs_fname = options_dict["jobs_fname"]
+    options_fname = options_dict["options_fname"]
+    result_fname = options_dict["result_fname"]
+    
+    #Generate arrays for field parameters
+    param_names = []
+    units = []
+    for param_name, param_dict in options_dict["field_params"].items():
+        param, unit = generate_field_param_array(param_dict)
+        exec(param_name+'= param')
+        param_names.append(param_name)
+        units.append(unit)
+        
+    #Generate a table of the field parameters to use for each job
+    mesh_params = ','.join([param_name for param_name in param_names])
+    exec('array_list = np.meshgrid('+mesh_params+')')
+    flattened_list = []
+    for array in array_list:
+        flattened_list.append(array.flatten())
+    field_param_table = np.vstack(flattened_list).T
+    
+    #Open the text file that is used for the jobsfile
+    with open(run_dir + '/jobs_files/' + jobs_fname, 'w+') as f:
+        #Loop over rows of the field parameter table
+        for row in field_param_table:
+            #Extract the parameters for this job
+            for i, param_value in enumerate(row):
+                param_name = param_names[i]
+                exec(param_name +'= param_value')
+        
+            #Start printing into the jobs file 
+            #Load the correct modules
+            print("module load miniconda", file=f, end = '; ')
+            print("source deactivate", file=f, end = '; ')
+            print("source activate non_adiabatic", file=f, end = '; ')
+            
+            #Generate the string that executes the program and gives it parameters
+            exec_str =  ("python " + cluster_params["prog"] + " "
+                            + run_dir + " " + options_fname + " " + jobs_fname
+                            + " {} {} {} {} {} {} {} {}".format(Ex0,Ey0,Ez0,tau_E,
+                                Bx0,By0,Bz0,f_B))
+            print(exec_str, file=f)
+    
+    #Also initialize the results file
+    with open(run_dir + '/results/' + result_fname, 'w+') as f:
+        print("Time dependence of E-field:", file = f)
+        print(options_dict["E_t"], file = f)
+        
+        print("Time dependence of B-field:", file = f)
+        print(options_dict["B_t"]+"\n\n" + 10*'*' +'\n', file = f)
+        
+        #Print headers for the results
+        headers = ['Probability']
+        for param_name, unit in zip(param_names,units):
+            headers.append(param_name +'/'+unit)
+        headers_str = '\t\t'.join(headers)
+        print(headers_str, file = f)
+
 
 def generate_batchfile(options_dict):
     """
-    Function that generates a batchfile that is used to submit the scan to 
-    a HPC cluster using slurm
+    Function that generates a batchfile basd on a given jobs file using dSQ
     """
-    run_dir = options_dict["run_dir"]
-    options_fname = options_dict["options_fname"]
-    batch_fname = run_dir + '/slurm/' + options_dict["batch_fname"]
-    cluster_params = options_dict["cluster_params"]
+    #Settings for dSQ
+    memory_per_cpu = '1g'
+    time = '60:00'
     
-    #Open file and write job submission options to it
-    with open(batch_fname,'w') as f:
-        print("#!/bin/bash", file = f)
-        if cluster_params["requeue"]:
-           print("#SBATCH --requeue", file=f)
-        
-        print("#SBATCH --partition "       + cluster_params["partition"],        file=f)
-        print("#SBATCH --job-name "        + cluster_params["job-name"],         file=f)
-        print("#SBATCH --ntasks "          + cluster_params["ntasks"],           file=f)
-        print("#SBATCH --cpus-per-task "   + cluster_params["cpus-per-task"],    file=f)
-        print("#SBATCH --mem-per-cpu "     + cluster_params["mem-per-cpu"],      file=f)
-        print("#SBATCH --time "            + cluster_params["time"],             file=f)
-        print("#SBATCH --mail-type "       + cluster_params["mail-type"],        file=f)
-        print("#SBATCH --mail-user "       + cluster_params["mail-user"],        file=f)
-        print("#SBATCH --output \""        + run_dir+"/slurm/slurm-%j.out"+"\"", file=f)
-        print("#SBATCH --error \""         + run_dir+"/slurm/slurm-%j.out"+"\"", file=f)
-        print("\nmodule load miniconda", file=f)
-        print("source deactivate", file=f)
-        print("source activate non_adiabatic", file=f)
-        exec_str =  ("python " + cluster_params["prog"] + " "
-                        + run_dir + " " + options_fname + " " + options_dict["result_fname"])
-        print(exec_str, file=f)
-    print(f"Generated batch file: {batch_fname}")
-    return batch_fname
-        
-
-def run_scan(options_dict):
-    #Record start time
-    start = time.time()
+    #Setting paths
+    run_dir = options_dict['run_dir']
+    jobs_fname = options_dict['jobs_fname']
+    jobs_path =run_dir + '/jobs_files/' + jobs_fname
+    batchfile_path = run_dir + '/slurm/' + 'dsq-' +jobs_fname
+    
+    #Generate the string to execute
+    exec_str = ('dsq --job-file ' + jobs_path + ' --mem-per-cpu ' + memory_per_cpu
+                +' -t ' + time + ' --mail-type NONE' + ' -o /dev/null --batch-file '
+                + batchfile_path)
+    
+    os.system(exec_str)
     
 
+def generate_field_param_array(param_dict):
+    """
+    Function that generates an array of values for a scan over a field parameter,
+    e.g. z-component of electric field
     
-    #Generate list of quantum numbers
-    QN = generate_QN()
+    input:
+    param_dict =  dictionary that specifies if parameter is to be scanned, what
+    value the parameter should take etc.
     
-    #Get electric and magnetic fields as function of time
-    B = get_B_field(options_dict)
-    E = get_E_field(options_dict)
+    return:
+    an array that contains the parameter
+    """
+    #Check if the parameter is supposed to be scanned
+    scan = param_dict["scan"]
     
-    #Get hamiltonian as function of E- and B-field
-    H = get_Hamiltonian(options_dict)
+    #Two cases: parameter is scanned or not scanned
+    if scan:
+        #If parameter is scanned, find the parameters for the scan
+        p_ini = param_dict["min"]
+        p_fin = param_dict["max"]
+        N = param_dict["N"]
+        param = np.linspace(p_ini, p_fin,N)
+        
+    else:
+        #If not scanned, set value
+        value = param_dict["value"]
+        param = np.array(value)
+        
+    #If the unit is specified, also get that
+    try:
+        unit = param_dict["unit"]
+    except ValueError:
+        pass
     
-    #Make state vector for lens state
-    lens_state_fname = options_dict["state_fname"]
-    with open(args.run_dir+lens_state_fname, 'rb') as f:
-        lens_state = pickle.load(f)    
-    lens_state_vec = lens_state.state_vector(QN)
-    
-    #Propagate the state in time
-    T = options_dict["E_params"]["tau"]*20
-    N_steps = int(options_dict["time_params"]["N_steps"])
-    probability = propagate_state(lens_state_vec, H, QN, B, E, T, N_steps)
-    
-    #Record end time
-    end = time.time()
-    
-    time_elapsed = end-start
-    
-    return probability, time_elapsed
-    
+    return param,unit
+
 
 if __name__ == "__main__":
     #Get arguments from command line and parse them
@@ -89,6 +154,11 @@ if __name__ == "__main__":
     parser.add_argument("run_dir", help = "Run directory")
     parser.add_argument("options_fname", help = "Filename of the options file")
     parser.add_argument("result_fname", help = "Filename for storing results")
+    parser.add_argument("jobs_fname", help = "Filename for storing jobs")
+    parser.add_argument("--jobs", help="If true, generate jobsfile"
+                    , action = "store_true")
+    parser.add_argument("--batch", help="If true, generate jobsfile and batchfile from that"
+                    , action = "store_true")
     parser.add_argument("--submit", help="If true, generate batchfile and submit to cluster"
                         , action = "store_true")
     
@@ -102,16 +172,13 @@ if __name__ == "__main__":
     options_dict["run_dir"] = args.run_dir
     options_dict["options_fname"] = args.options_fname
     options_dict["result_fname"] = args.result_fname
-        
-    #Generate a batch file and submit to cluster
+    options_dict["jobs_fname"] = args.jobs_fname
+    
+    if args.jobs:
+        generate_jobs_file(options_dict)
+    
+    #Generate a jobs file and batch file, and submit to cluster
     if args.submit:
         batch_fname = generate_batchfile(options_dict)
         os.system(f"sbatch {batch_fname}")
         
-    #If this program isn't used for submitting, it is used to run the scan
-    else:
-        probability, time_elapsed = run_scan(options_dict)
-        
-        with open(args.run_dir+'/results/'+args.result_fname,'w') as f:
-            print("P = {:.5f}, time_elapsed = {:.2f}".format(probability[0][0], time_elapsed)
-            , file  = f)
