@@ -36,16 +36,16 @@ def generate_jobs_file(options_dict):
     
     #Generate arrays for field parameters
     param_names = []
+    params = []
     units = []
     for param_name, param_dict in options_dict["field_params"].items():
         param, unit = generate_field_param_array(param_dict)
-        exec(param_name+'= param')
         param_names.append(param_name)
+        params.append(param)
         units.append(unit)
         
     #Generate a table of the field parameters to use for each job
-    mesh_params = ','.join([param_name for param_name in param_names])
-    exec('array_list = np.meshgrid('+mesh_params+')')
+    array_list = np.meshgrid(*params)
     flattened_list = []
     for array in array_list:
         flattened_list.append(array.flatten())
@@ -56,10 +56,12 @@ def generate_jobs_file(options_dict):
         #Loop over rows of the field parameter table
         for row in field_param_table:
             #Extract the parameters for this job
+            param_dict = {}
             for i, param_value in enumerate(row):
                 param_name = param_names[i]
-                exec(param_name +'= param_value')
-        
+                param_dict[param_name] = param_value
+                
+                
             #Start printing into the jobs file 
             #Load the correct modules
             print("module load miniconda", file=f, end = '; ')
@@ -69,8 +71,10 @@ def generate_jobs_file(options_dict):
             #Generate the string that executes the program and gives it parameters
             exec_str =  ("python " + cluster_params["prog"] + " "
                             + run_dir + " " + options_fname + " " + jobs_fname
-                            + " {} {} {} {} {} {} {} {}".format(Ex0,Ey0,Ez0,tau_E,
-                                Bx0,By0,Bz0,f_B))
+                            + " {} {} {} {} {} {} {} {}".format(param_dict["Ex0"]
+                            ,param_dict["Ey0"],param_dict["Ez0"],param_dict["tau_E"],
+                                param_dict["Bx0"],param_dict["By0"],param_dict["Bz0"],
+                                param_dict["f_B"]))
             print(exec_str, file=f)
     
     #Also initialize the results file
