@@ -178,11 +178,18 @@ if __name__ == "__main__":
     options_dict["result_fname"] = args.result_fname
     options_dict["jobs_fname"] = args.jobs_fname
     
+    #Different uses of main.py. Can either make a job file, job file + batch file,
+    #or make both files and submit
     if args.jobs:
         generate_jobs_file(options_dict)
+        
+    elif args.batch:
+        generate_jobs_file(options_dict)
+        generate_batchfile(options_dict)
     
     #Generate a jobs file and batch file, and submit to cluster
-    if args.submit:
+    elif args.submit:
+        generate_jobs_file(options_dict)
         batch_fname = generate_batchfile(options_dict)
         os.system(f"sbatch {batch_fname}")
         
