@@ -108,18 +108,18 @@ def get_Hamiltonian(options_dict):
     
     return H
 
-def get_E_field(options_dict):
+def get_E_field(E0,tau_E, options_dict):
     """
     Function that generates the electric field as a function of time based on
     an options dictionary.
     """
     #Get electric field components
-    Ex0 = options_dict["E_params"]["Ex0"]
-    Ey0 = options_dict["E_params"]["Ey0"]
-    Ez0 = options_dict["E_params"]["Ez0"]
+    Ex0 = E0[0]
+    Ey0 = E0[1]
+    Ez0 = E0[2]
     
     #Get the time constant for the lens field from options dictionary
-    tau = options_dict["E_params"]["tau"]
+    tau = tau_E
     
     #Calculate other time parameters based on tau
     T = 20*tau #s
@@ -136,19 +136,14 @@ def get_E_field(options_dict):
     return E_t
     
     
-def get_B_field(options_dict):
+def get_B_field(B0, f_B, tau_E, options_dict):
     """
     Function that generates the magnetic field as a function of time based on
     an options dictionary.
     """
-    #Get magnetic field components
-    Bx0 = options_dict["B_params"]["B0"][0]
-    By0 = options_dict["B_params"]["B0"][1]
-    Bz0 = options_dict["B_params"]["B0"][2]
-    B0 = options_dict["B_params"]["B0"]
-    
+   
     #Get the time constant for the lens field from options dictionary
-    tau = options_dict["E_params"]["tau"]
+    tau = tau_E
     
     #Calculate other time parameters based on tau
     T = 20*tau #s

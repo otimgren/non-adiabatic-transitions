@@ -7,11 +7,9 @@ Created on Thu Jan 16 20:32:49 2020
 import numpy as np
 import argparse
 import json
-import pickle
 import time
 import os, sys
-from state_propagation_functions import *
-from datetime import datetime
+
 
 
 def generate_jobs_file(options_dict):
@@ -70,7 +68,7 @@ def generate_jobs_file(options_dict):
             
             #Generate the string that executes the program and gives it parameters
             exec_str =  ("python " + cluster_params["prog"] + " "
-                            + run_dir + " " + options_fname + " " + jobs_fname
+                            + run_dir + " " + options_fname + " " + result_fname
                             + " {} {} {} {} {} {} {} {}".format(param_dict["Ex0"]
                             ,param_dict["Ey0"],param_dict["Ez0"],param_dict["tau_E"],
                                 param_dict["Bx0"],param_dict["By0"],param_dict["Bz0"],
@@ -98,7 +96,8 @@ def generate_batchfile(options_dict):
     Function that generates a batchfile basd on a given jobs file using dSQ
     """
     #Settings for dSQ
-    memory_per_cpu = '1g'
+    cluster_params = options_dict["cluster_params"]
+    memory_per_cpu = cluster_params["mem-per-cpu"]
     time = '60:00'
     
     #Setting paths
@@ -114,6 +113,8 @@ def generate_batchfile(options_dict):
     
     os.system(exec_str)
     
+    #Return the path to the batchfile
+    return batchfile_path
 
 def generate_field_param_array(param_dict):
     """
@@ -190,6 +191,6 @@ if __name__ == "__main__":
     #Generate a jobs file and batch file, and submit to cluster
     elif args.submit:
         generate_jobs_file(options_dict)
-        batch_fname = generate_batchfile(options_dict)
-        os.system(f"sbatch {batch_fname}")
+        batchfile_path = generate_batchfile(options_dict)
+        os.system("sbatch {}".format(batchfile_path))
         
