@@ -142,7 +142,7 @@ def get_B_field(B0, f_B, tau_E, options_dict):
     an options dictionary.
     """
    
-    #Get the time constant for the lens field from options dictionary
+    #Get the time constant for the lens field
     tau = tau_E
     
     #Calculate other time parameters based on tau
@@ -153,7 +153,7 @@ def get_B_field(B0, f_B, tau_E, options_dict):
     t1 = T * 3/4 #s
     t0_B = t0-2*tau
     t1_B = t1+2*tau
-    f = options_dict["B_params"]["f"]
+    f = f_B
     
     #Parse the expression given for E as function of time in options dictionary
     t = Symbol('t', real = True)
