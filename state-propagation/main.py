@@ -117,7 +117,7 @@ def generate_batchfile(options_dict):
     with open(batchfile_path, 'r') as f:
         lines = f.readlines()
     
-    text = '# SBATCH --partition '+options_dict["cluster_params"]["partition"] 
+    text = '#SBATCH --partition '+options_dict["cluster_params"]["partition"]+'\n' 
     lines.insert(1, text)
     
     with open(batchfile_path, 'w') as f:
