@@ -98,7 +98,7 @@ def generate_batchfile(options_dict):
     #Settings for dSQ
     cluster_params = options_dict["cluster_params"]
     memory_per_cpu = cluster_params["mem-per-cpu"]
-    time = '60:00'
+    time = cluster_params["time"]
     
     #Setting paths
     run_dir = options_dict['run_dir']

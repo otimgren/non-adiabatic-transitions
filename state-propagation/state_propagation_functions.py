@@ -177,3 +177,30 @@ def generate_QN(Jmin = 0, Jmax = 6, I_Tl = 1/2, I_F = 1/2):
      ]
     
     return QN
+
+def calculate_timestep(t, E_t, dt_max = 1e-4, dt_grad = 1e-9, scaling_factor = 1):
+    """
+    Function for evaluating a suitable timestep to propagate the simulation at a given time
+    inputs:
+    t = current time
+    E_t = electric field as a function of time, used to evaluate gradient of electric field
+    scaling_factor = parameter to scale the timesteps if desired
+    
+    returns:
+    dt = timestep for simulation
+    """
+    
+    #Calculate gradient of E
+    grad_E = (E_t(t+dt_grad)-E_t(t))/dt_grad
+    
+    #Calculate dipole moment in hertz
+    D_TlF = 4.2282 * 0.393430307 *5.291772e-9/4.135667e-15 # [Hz/(V/cm)]
+    
+    #Calculate suitable timestep
+    dt = 1/np.sqrt(D_TlF * np.linalg.norm(grad_E)) * scaling_factor
+    
+    #If timestep is larger than the max allowed, set timestep to the max
+    if dt > dt_max:
+        dt = dt_max
+        
+    return dt
