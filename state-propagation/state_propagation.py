@@ -67,8 +67,7 @@ if __name__ == "__main__":
     
     #Propagate the state in time
     T = tau_E*20
-    N_steps = int(options_dict["time_params"]["N_steps"])
-    probability = propagate_state(lens_state_vec, H, QN, B, E, T, N_steps)
+    probability = propagate_state(lens_state_vec, H, QN, B, E, T)
     
     #Append results into file
     with open(args.run_dir + '/results/' + args.result_fname, 'a') as f:

@@ -24,7 +24,7 @@ from classes import *
 from quantum_operators import *
 #%%Define functions
 
-def propagate_state(lens_state_vec, H, QN, B, E, T, N_steps):
+def propagate_state(lens_state_vec, H, QN, B, E, T):
     """
     Function that propagates the state of a quantum system defined by 
     Hamiltonian H from t = 0 to t=T. The initial state of the system is the 
@@ -64,19 +64,23 @@ def propagate_state(lens_state_vec, H, QN, B, E, T, N_steps):
     #Define initial state
     psi = initial_state_vec
     
-    #Calculate timestep
-    dt = T/N_steps
-    
     #Loop over timesteps to evolve system in time:
-    for i in tqdm(range(1,N_steps+1)):
+    t = 0
+    while t<T:
+        #Calculate timestep
+        dt = calculate_timestep(t, E)
+        
         #Calculate time for this step
-        t_i = i*dt 
+        t += dt
         
         #Evaluate hamiltonian at this time
-        H_i = H(E(t_i), B(t_i))
+        H_i = H(E(t), B(t))
+        
+        #Diagonalize the hamiltonian
+        D, V = np.linalg.eigh(H_i)
         
         #Propagate the state vector        
-        psi = expm(-1j*2*np.pi*H_i*dt) @ psi
+        psi = V @ np.diag(np.exp(-1j*2*np.pi*D*dt)) @ V.T @ psi
     
 
     #Determine which eigenstate of the Hamiltonian corresponds to the lens state
