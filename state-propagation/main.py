@@ -113,6 +113,16 @@ def generate_batchfile(options_dict):
     
     os.system(exec_str)
     
+    #Write which partition to use to the file on line 2
+    with open(batchfile_path, 'r') as f:
+        lines = f.readlines()
+    
+    text = '# SBATCH --partition '+options_dict["cluster_params"]["partition"] 
+    lines.insert(1, text)
+    
+    with open(batchfile_path, 'w') as f:
+        f.writelines(lines)
+    
     #Return the path to the batchfile
     return batchfile_path
 
