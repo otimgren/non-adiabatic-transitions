@@ -99,6 +99,7 @@ def generate_batchfile(options_dict):
     cluster_params = options_dict["cluster_params"]
     memory_per_cpu = cluster_params["mem-per-cpu"]
     time = cluster_params["time"]
+    mail_type = cluster_params["mail-type"]
     
     #Setting paths
     run_dir = options_dict['run_dir']
@@ -108,7 +109,7 @@ def generate_batchfile(options_dict):
     
     #Generate the string to execute
     exec_str = ('dsq --job-file ' + jobs_path + ' --mem-per-cpu ' + memory_per_cpu
-                +' -t ' + time + ' --mail-type NONE' + ' -o /dev/null --batch-file '
+                +' -t ' + time + ' --mail-type '+ mail_type + ' -o /dev/null --batch-file '
                 + batchfile_path)
     
     os.system(exec_str)
