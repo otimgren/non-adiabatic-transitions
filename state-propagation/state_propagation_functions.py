@@ -80,7 +80,7 @@ def propagate_state(lens_state_vec, H, QN, B, E, T):
         D, V = np.linalg.eigh(H_i)
         
         #Propagate the state vector        
-        psi = V @ np.diag(np.exp(-1j*2*np.pi*D*dt)) @ V.T @ psi
+        psi = V @ np.diag(np.exp(-1j*2*np.pi*D*dt)) @ np.conj(V.T) @ psi
     
 
     #Determine which eigenstate of the Hamiltonian corresponds to the lens state
