@@ -86,7 +86,7 @@ def propagate_state(lens_state_vec, H, QN, B, E, T):
     #Determine which eigenstate of the Hamiltonian corresponds to the lens state
     #in the final values of the E- and B-fields
     #Diagonalize H
-    energiesT, evecsT = np.linalg.eigh(H(E(T),B(T)))
+    energiesT, evecsT = np.linalg.eigh(H(E(t),B(t)))
     
     #Find the index of the state corresponding to the lens state
     index_fin = find_state_idx(lens_state_vec, evecsT, n=1)

@@ -41,7 +41,7 @@ if __name__ == "__main__":
     #Add run directory and options filename to options_dict
     options_dict["run_dir"] = args.run_dir
     options_dict["options_fname"] = args.options_fname
-    options_dict["result_fname"] = args.result_fname
+    result_fname =  args.result_fname  
     
     #Make arrays of E- and B-field parameters
     E0 = np.array((args.Ex0,args.Ey0,args.Ez0))

@@ -119,7 +119,7 @@ def generate_batchfile(options_dict):
     
     text = ('#SBATCH --partition '+options_dict["cluster_params"]["partition"])
     if options_dict["cluster_params"]["requeue"]:
-        text += '\n#SBATCH --requeue'
+        text += '\n#SBATCH --requeue\n'
     lines.insert(1, text)
     
     with open(batchfile_path, 'w') as f:
@@ -188,7 +188,7 @@ if __name__ == "__main__":
     #Add run directory and options filename to options_dict
     options_dict["run_dir"] = args.run_dir
     options_dict["options_fname"] = args.options_fname
-    options_dict["result_fname"] = args.result_fname
+    options_dict["result_fname"] = args.result_fname + time.strftime('_%Y-%m-%d_%H-%M-%S')
     options_dict["jobs_fname"] = args.jobs_fname
     
     #Different uses of main.py. Can either make a job file, job file + batch file,
