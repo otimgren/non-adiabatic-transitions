@@ -117,8 +117,9 @@ def generate_batchfile(options_dict):
     with open(batchfile_path, 'r') as f:
         lines = f.readlines()
     
-    text = ('#SBATCH --partition '+options_dict["cluster_params"]["partition"]
-            +'\n#SBATCH --requeue')
+    text = ('#SBATCH --partition '+options_dict["cluster_params"]["partition"])
+    if options_dict["cluster_params"]["requeue"]:
+        text += '\n#SBATCH --requeue'
     lines.insert(1, text)
     
     with open(batchfile_path, 'w') as f:
