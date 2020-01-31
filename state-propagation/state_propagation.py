@@ -44,7 +44,8 @@ if __name__ == "__main__":
     QN = generate_QN()
     
     #Get the trajectory from file
-    trajectories_fname = options_dict["trajectories_fname"]
+    trajectories_fname = (options_dict["trajectories_fname"] + 'trajectory' 
+                          + str(n_trajectory) + '.pickle')
     with open(args.run_dir+trajectories_fname,"rb") as f:
         x_t, T = dill.load(f)[args.n_trajectory]
     
