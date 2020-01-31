@@ -9,6 +9,7 @@ import argparse
 import json
 import time
 import os, sys
+import dill
 
 
 
@@ -31,35 +32,19 @@ def generate_jobs_file(options_dict):
     jobs_fname = options_dict["jobs_fname"]
     options_fname = options_dict["options_fname"]
     result_fname = options_dict["result_fname"]
+    trajectories_fname = options_dict["trajectories_fname"]
     
-    #Generate arrays for field parameters
-    param_names = []
-    params = []
-    units = []
-    for param_name, param_dict in options_dict["field_params"].items():
-        param, unit = generate_field_param_array(param_dict)
-        param_names.append(param_name)
-        params.append(param)
-        units.append(unit)
-        
-    #Generate a table of the field parameters to use for each job
-    array_list = np.meshgrid(*params)
-    flattened_list = []
-    for array in array_list:
-        flattened_list.append(array.flatten())
-    field_param_table = np.vstack(flattened_list).T
+    #Check how many trajectories there are in the trajectories file
+    with open(run_dir+trajectories_fname,"rb") as f:
+        trajectories_list = dill.load(f)
+    n_trajectories = len(trajectories_list)
+
     
     #Open the text file that is used for the jobsfile
     with open(run_dir + '/jobs_files/' + jobs_fname, 'w+') as f:
-        #Loop over rows of the field parameter table
-        for row in field_param_table:
-            #Extract the parameters for this job
-            param_dict = {}
-            for i, param_value in enumerate(row):
-                param_name = param_names[i]
-                param_dict[param_name] = param_value
-                
-                
+        #Loop over trajectories
+        for n in range(0,n_trajectories):
+            
             #Start printing into the jobs file 
             #Load the correct modules
             print("module load miniconda", file=f, end = '; ')
@@ -69,24 +54,21 @@ def generate_jobs_file(options_dict):
             #Generate the string that executes the program and gives it parameters
             exec_str =  ("python " + cluster_params["prog"] + " "
                             + run_dir + " " + options_fname + " " + result_fname
-                            + " {} {} {} {} {} {} {} {}".format(param_dict["Ex0"]
-                            ,param_dict["Ey0"],param_dict["Ez0"],param_dict["tau_E"],
-                                param_dict["Bx0"],param_dict["By0"],param_dict["Bz0"],
-                                param_dict["f_B"]))
+                            + " {} ".format(n))
+            if n == 0:
+                exec_str += "--save_fields"
+            
             print(exec_str, file=f)
     
     #Also initialize the results file
     with open(run_dir + '/results/' + result_fname, 'w+') as f:
-        print("Time dependence of E-field:", file = f)
-        print(options_dict["E_t"], file = f)
+        print("Options:", file = f)
+        print(options_dict, file = f)
         
-        print("Time dependence of B-field:", file = f)
-        print(options_dict["B_t"]+"\n\n" + 10*'*' +'\n', file = f)
+        print(20*'*', file = f)
         
         #Print headers for the results
-        headers = ['Probability']
-        for param_name, unit in zip(param_names,units):
-            headers.append(param_name +'/'+unit)
+        headers = ['Probability','Trajectory']
         headers_str = '\t\t'.join(headers)
         print(headers_str, file = f)
 
