@@ -45,7 +45,7 @@ if __name__ == "__main__":
     
     #Get the trajectory from file
     trajectories_fname = (options_dict["trajectories_path"] + 'trajectory' 
-                          + str(n_trajectory) + '.pickle')
+                          + str(args.n_trajectory) + '.pickle')
     with open(args.run_dir+trajectories_fname,"rb") as f:
         x_t, T = dill.load(f)
     
