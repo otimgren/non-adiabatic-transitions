@@ -44,10 +44,10 @@ if __name__ == "__main__":
     QN = generate_QN()
     
     #Get the trajectory from file
-    trajectories_fname = (options_dict["trajectories_fname"] + 'trajectory' 
+    trajectories_fname = (options_dict["trajectories_path"] + 'trajectory' 
                           + str(n_trajectory) + '.pickle')
     with open(args.run_dir+trajectories_fname,"rb") as f:
-        x_t, T = dill.load(f)[args.n_trajectory]
+        x_t, T = dill.load(f)
     
     #Get electric and magnetic fields as function of position
     B = get_B_field(options_dict)
