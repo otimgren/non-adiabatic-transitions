@@ -35,9 +35,9 @@ def generate_jobs_file(options_dict):
     trajectories_fname = options_dict["trajectories_fname"]
     
     #Check how many trajectories there are in the trajectories file
-    with open(run_dir+trajectories_fname,"rb") as f:
-        trajectories_list = dill.load(f)
-    n_trajectories = len(trajectories_list)
+    n_traj_start = options_dict["n_traj_start"]
+    n_traj_end = options_dict["n_traj_end"]
+    n_trajectories = n_traj_end - n_traj_start
 
     
     #Open the text file that is used for the jobsfile
