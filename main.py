@@ -32,7 +32,7 @@ def generate_jobs_file(options_dict):
     jobs_fname = options_dict["jobs_fname"]
     options_fname = options_dict["options_fname"]
     result_fname = options_dict["result_fname"]
-    trajectories_fname = options_dict["trajectories_fname"]
+    
     
     #Check how many trajectories there are in the trajectories file
     n_traj_start = options_dict["n_traj_start"]
