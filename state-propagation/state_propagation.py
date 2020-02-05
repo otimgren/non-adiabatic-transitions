@@ -91,7 +91,7 @@ if __name__ == "__main__":
     
     #Append results into file
     with open(args.run_dir + '/results/' + args.result_fname, 'a') as f:
-        results_list = ["{:.7e}".format(value) for value in [probability[0,0], args.n_trajectory]]
+        results_list = ["{:.7e}".format(probability[0,0]), str(args.n_trajectory), str(probability > 1)]
         results_str = "\t\t".join(results_list)
         print(results_str, file = f)
 

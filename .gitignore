@@ -1,3 +1,4 @@
 *.ipynb
 *.ini
 *__pycache__
+/molecular-states-and-classes/*
