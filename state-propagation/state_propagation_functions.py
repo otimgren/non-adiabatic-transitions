@@ -238,6 +238,39 @@ def E_field_lens(x, z0 = 0, V = 3e4, R = 1.75*0.0254/2, L = 0.60, l = 20e-3):
     
     return E_vec/100
 
+#Define a function that gives the Ez component of the lens field as a function of position
+def lens_Ez(x, lens_z0, lens_L):
+    """
+    Function that evaluates the z-component of the electric field produced by the lens based on position
+    
+    inputs:
+    x = position (in meters) where Ex is evaluated (np.array) 
+    
+    returns:
+    E = np.array that only has z-component (in V/cm)
+    """
+    
+    #Determine radial position and the angle phi in cylindrical coordinates
+    r = np.sqrt(x[0]**2+x[1]**2)
+        
+    #Calculate the value of the electric field
+    #Calculate radial scaling
+    c2 = 13673437.6
+    c4 = 9.4893e+09
+    radial_scaling = c2*r**2 + c4*r**4
+    
+    #Angular function
+    angular = 2 * x[0]*x[1]/(r**2)
+    
+    #In z the field varies as a lorentzian
+    sigma = 12.811614314258744/1000
+    z1 = lens_z0 - lens_L/2
+    z2 = lens_z0 + lens_L/2
+    z_function = (np.exp(-(x[2]-z1)**2/(2*sigma**2)) - np.exp(-(x[2]-z2)**2/(2*sigma**2)))
+    
+    E_z = radial_scaling*angular*z_function
+    
+    return np.array((0,0,E_z))
 
 def E_field_ring(x,z0 = 0, V = 2e4, R = 2.25*0.0254):
     """
@@ -267,6 +300,7 @@ def get_E_field(options_dict):
     #Get parameters that define the electric field from the options dictionary
     lens_z0 = 0.6/2 + 0.25
     lens_l = options_dict["lens"]["l"]
+    lens_L = 0.6
     V1 = options_dict["ring_1"]["V"]
     ring1_z0 = options_dict["ring_1"]["z0"]
     V2 = options_dict["ring_2"]["V"]
@@ -276,10 +310,12 @@ def get_E_field(options_dict):
     E_field = lambda x: (E_field_ring(x, z0 = ring1_z0, V = V1) 
                             + E_field_ring(x, z0 = ring2_z0, V = V2)
                          + E_field_lens(x, z0 = lens_z0, l = lens_l)
+                         + lens_Ez(x, lens_z0, lens_L)
                         + E_field_ring(x, z0 = 2*lens_z0 - ring2_z0, V = -V2)
                         + E_field_ring(x, z0 = 2*lens_z0 - ring1_z0, V = -V1))
     
     return E_field
+
 
 def poly_gauss(z, c2, c4, l):     
     """

@@ -35,8 +35,13 @@ if __name__ == "__main__":
     options_dict["result_fname"] = args.result_fname + time.strftime('_%Y-%m-%d_%H-%M-%S') +'.txt'
     options_dict["jobs_fname"] = args.jobs_fname
     
+    #Check how many trajectories there are in the trajectories file
+    n_traj_start = options_dict["n_traj_start"]
+    n_traj_end = options_dict["n_traj_end"]
+    n_trajectories = n_traj_end - n_traj_start
+    
     #Make a jobs file
-    generate_jobs_file(options_dict)
+    generate_jobs_files(options_dict)
     
     #Generate the string that exectutes the state propagation program
     cluster_params = options_dict["cluster_params"]
@@ -44,7 +49,6 @@ if __name__ == "__main__":
     jobs_fname = options_dict["jobs_fname"]
     options_fname = options_dict["options_fname"]
     result_fname = options_dict["result_fname"]
-    trajectories_fname = options_dict["trajectories_fname"]
     exec_str =  ("python "  + cluster_params["prog"] 
                             +  ' "' + run_dir +  '"' + " " + options_fname + " " + result_fname
                             + " {} ".format(10) + '--save_fields')
