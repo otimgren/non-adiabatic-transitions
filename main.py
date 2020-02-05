@@ -87,7 +87,7 @@ def generate_jobs_files(options_dict):
         print(20*'*', file = f)
         
         #Print headers for the results
-        headers = ['Probability','Trajectory']
+        headers = ['Probability','Trajectory', 'Error']
         headers_str = '\t\t'.join(headers)
         print(headers_str, file = f)
         
