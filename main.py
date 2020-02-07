@@ -51,10 +51,10 @@ def generate_jobs_files(options_dict):
         
         #Figure out what trajectory indices to use
         if n < n_loops-1:
-            i_start = n*n_max
-            i_end = (n+1)*n_max
+            i_start = n*n_max + n_traj_start
+            i_end = i_start+n_max
         elif n == n_loops-1:
-            i_start = n*n_max
+            i_start = n*n_max + n_traj_start
             i_end = n_traj_end
         
         #Append name of jobsfile to list of jobsfile names
