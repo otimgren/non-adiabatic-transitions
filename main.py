@@ -74,8 +74,8 @@ def generate_jobs_files(options_dict):
                 exec_str =  ("python " + cluster_params["prog"] + " "
                                 + run_dir + " " + options_fname + " " + result_fname
                                 + " {} ".format(i))
-                if i == 0:
-                    exec_str += "--save_fields"
+                # if i == 0:
+                #     exec_str += "--save_fields"
                     
                 print(exec_str, file=f)
     
