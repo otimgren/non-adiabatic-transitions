@@ -208,8 +208,8 @@ if __name__ == "__main__":
         generate_jobs_files(options_dict)
         
     elif args.batch:
-        generate_jobs_files(options_dict)
-        generate_batchfiles(options_dict)
+        jobs_files = generate_jobs_files(options_dict)
+        generate_batchfiles(jobs_files,options_dict)
     
     #Generate a jobs file and batch file, and submit to cluster
     elif args.submit:
