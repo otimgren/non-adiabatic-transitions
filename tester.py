@@ -41,7 +41,7 @@ if __name__ == "__main__":
     n_trajectories = n_traj_end - n_traj_start
     
     #Make a jobs file
-    generate_jobs_files(options_dict)
+    jobs_files = generate_jobs_files(options_dict)
     
     #Generate the string that exectutes the state propagation program
     cluster_params = options_dict["cluster_params"]
