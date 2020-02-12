@@ -170,6 +170,10 @@ def propagate_state(lens_state_vec, H, QN, B, E, T, N_steps, save_fields=False):
         #Diagonalize the hamiltonian
         D, V, info = zheevd(H_i)
         
+        #If zheevd doesn't converge, use numpy instead
+        if info != 0:
+            D, V = np.linalg.eigh(H_i)
+        
         #Propagate the state vector        
         psi = V @ np.diag(np.exp(-1j*2*np.pi*D*dt)) @ np.conj(V.T) @ psi
         
