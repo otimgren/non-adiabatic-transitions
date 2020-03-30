@@ -73,8 +73,6 @@ if __name__ == "__main__":
     z0 = r0[2]
     L = 1.1
     z1 = z0 + L
-
-    vz = v[2]
     T = np.abs(L/vz)
     
     #Get electric and magnetic fields as function of position

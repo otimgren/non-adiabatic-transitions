@@ -161,7 +161,7 @@ def propagate_state(lens_state_vec, H, QN, B, E, T, N_steps, save_fields=False):
         t += dt
         
         #Calculate fields
-        E_t = E(t)
+        E_t = np.array([0,0,np.linalg.norm(E(t))])
         B_t = B(t)
         
         #Evaluate hamiltonian at this time
@@ -318,6 +318,8 @@ def get_E_field(options_dict):
                         + E_field_ring(x, z0 = 2*lens_z0 - ring2_z0, V = -V2)
                         + E_field_ring(x, z0 = 2*lens_z0 - ring1_z0, V = -V1))
     
+
+
     return E_field
 
 
