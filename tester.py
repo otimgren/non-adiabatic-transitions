@@ -35,11 +35,6 @@ if __name__ == "__main__":
     options_dict["result_fname"] = args.result_fname + time.strftime('_%Y-%m-%d_%H-%M-%S') +'.txt'
     options_dict["jobs_fname"] = args.jobs_fname
     
-    #Check how many trajectories there are in the trajectories file
-    n_traj_start = options_dict["n_traj_start"]
-    n_traj_end = options_dict["n_traj_end"]
-    n_trajectories = n_traj_end - n_traj_start
-    
     #Make a jobs file
     jobs_files = generate_jobs_files(options_dict)
     
@@ -51,7 +46,7 @@ if __name__ == "__main__":
     result_fname = options_dict["result_fname"]
     exec_str =  ("python "  + cluster_params["prog"] 
                             +  ' "' + run_dir +  '"' + " " + options_fname + " " + result_fname
-                            + " {} ".format(10) + '--save_fields')
+                            + " {} ".format(200))
     print(exec_str)
     os.system(exec_str)
 
