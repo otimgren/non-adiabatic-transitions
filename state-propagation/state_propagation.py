@@ -23,7 +23,7 @@ if __name__ == "__main__":
     parser.add_argument("run_dir", help = "Run directory")
     parser.add_argument("options_fname", help = "Filename of the options file")
     parser.add_argument("result_fname", help = "Filename for storing results")
-    parser.add_argument("n_trajectory", type = int)
+    parser.add_argument("vz", type = float)
     parser.add_argument("--save_fields", help = "If true, save the E-and B-fields",
                                                  action = "store_true")
 
@@ -43,11 +43,39 @@ if __name__ == "__main__":
     #Generate list of quantum numbers
     QN = generate_QN()
     
-    #Get the trajectory from file
-    trajectories_fname = (options_dict["trajectories_path"] + 'trajectory' 
-                          + str(args.n_trajectory) + '.pickle')
-    with open(args.run_dir+trajectories_fname,"rb") as f:
-        x_t, T = dill.load(f)
+    #Define the trajectory
+    def molecule_position(t, r0, v):
+        """
+        Functions that returns position of molecule at a given time for given initial position and velocity.
+        inputs:
+        t = time in seconds
+        r0 = position of molecule at t = 0 in meters
+        v = velocity of molecule in meters per second
+        
+        returns:
+        r = position of molecule in metres
+        """
+        #If t is iterable 
+        try:
+            r =  np.array([r0 + v*t_i for t_i in t])
+        except TypeError: 
+            r = r0 + v*t
+        
+        return r
+
+    #Define the position of the molecule as a fucntion of time
+    r0 = np.array(options_dict["r0"])
+    vz = args.vz
+    v = np.array((0,0,vz))
+    r_t = lambda t: molecule_position(t, r0, v)
+
+    #Define the total time for which the molecule is simulated
+    z0 = r0[2]
+    L = 1.1
+    z1 = z0 + L
+
+    vz = v[2]
+    T = np.abs(L/vz)
     
     #Get electric and magnetic fields as function of position
     B = get_B_field(options_dict)
@@ -55,7 +83,7 @@ if __name__ == "__main__":
     
     #Get B and E as functions of time:
     E_t = lambda t: E(x_t(t))
-    B_t = lambda t: B(x_t(t))
+    B_t = lambda t: B(x_t(t))*0
     
     #Get hamiltonian as function of E- and B-field
     H = get_Hamiltonian(options_dict)
@@ -91,7 +119,7 @@ if __name__ == "__main__":
     
     #Append results into file
     with open(args.run_dir + '/results/' + args.result_fname, 'a') as f:
-        results_list = ["{:.7e}".format(probability[0,0]), str(args.n_trajectory), str(probability > 1)]
+        results_list = ["{:.7e}".format(probability[0,0]), str(vz), str(probability > 1)]
         results_str = "\t\t".join(results_list)
         print(results_str, file = f)
 

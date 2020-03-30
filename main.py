@@ -34,50 +34,29 @@ def generate_jobs_files(options_dict):
     result_fname = options_dict["result_fname"]
     
     
-    #Check how many trajectories there are in the trajectories file
-    n_traj_start = options_dict["n_traj_start"]
-    n_traj_end = options_dict["n_traj_end"]
-    n_trajectories = n_traj_end - n_traj_start
-
-    #Max size for jobsarray is 10000 jobs so if n_trajectories > 1e4, need
-    #to split the job into multiple arrays
-    n_max = int(1e4)
-    n_loops = int(n_trajectories/n_max)+1
+    #Check how many velocities we're scanning over (must be less than 1e4)
+    try:
+        vzs = 10**np.linspace(*options_dict["logv"])
+    except KeyError:
+        vzs = np.linspace(*options_dict["v"])
     
-    jobs_files = []
-    
-    #Loop over number of jobsfiles needed
-    for n in range(0, n_loops):
-        
-        #Figure out what trajectory indices to use
-        if n < n_loops-1:
-            i_start = n*n_max + n_traj_start
-            i_end = i_start+n_max
-        elif n == n_loops-1:
-            i_start = n*n_max + n_traj_start
-            i_end = n_traj_end
-        
-        #Append name of jobsfile to list of jobsfile names
-        jobs_files.append(jobs_fname+'_'+str(n)+'.txt')
-        #Open the text file that is used for the jobsfile
-        with open(run_dir + '/jobs_files/' + jobs_fname+'_'+str(n)+'.txt', 'w+') as f:
-            #Loop over trajectories
-            for i in range(i_start,i_end):
+    #Open the text file that is used for the jobsfile
+    with open(run_dir + '/jobs_files/' + jobs_fname+'.txt', 'w+') as f:
+        #Loop over trajectories
+        for vz in vzs:
+            
+            #Start printing into the jobs file 
+            #Load the correct modules
+            print("module load miniconda", file=f, end = '; ')
+            print("source deactivate", file=f, end = '; ')
+            print("source activate non_adiabatic", file=f, end = '; ')
+            
+            #Generate the string that executes the program and gives it parameters
+            exec_str =  ("python " + cluster_params["prog"] + " "
+                            + run_dir + " " + options_fname + " " + result_fname
+                            + " {} ".format(vz))
                 
-                #Start printing into the jobs file 
-                #Load the correct modules
-                print("module load miniconda", file=f, end = '; ')
-                print("source deactivate", file=f, end = '; ')
-                print("source activate non_adiabatic", file=f, end = '; ')
-                
-                #Generate the string that executes the program and gives it parameters
-                exec_str =  ("python " + cluster_params["prog"] + " "
-                                + run_dir + " " + options_fname + " " + result_fname
-                                + " {} ".format(i))
-                # if i == 0:
-                #     exec_str += "--save_fields"
-                    
-                print(exec_str, file=f)
+            print(exec_str, file=f)
     
     #Also initialize the results file
     with open(run_dir + '/results/' + result_fname, 'w+') as f:
@@ -87,7 +66,7 @@ def generate_jobs_files(options_dict):
         print(20*'*', file = f)
         
         #Print headers for the results
-        headers = ['Probability','Trajectory', 'Error']
+        headers = ['Probability','vz', 'Error']
         headers_str = '\t\t'.join(headers)
         print(headers_str, file = f)
         
