@@ -67,7 +67,7 @@ if __name__ == "__main__":
     r0 = np.array(options_dict["r0"])
     vz = args.vz
     v = np.array((0,0,vz))
-    r_t = lambda t: molecule_position(t, r0, v)
+    x_t = lambda t: molecule_position(t, r0, v)
 
     #Define the total time for which the molecule is simulated
     z0 = r0[2]
