@@ -40,6 +40,8 @@ def generate_jobs_files(options_dict):
     except KeyError:
         vzs = np.linspace(*options_dict["v"])
     
+    jobs_files = []
+
     #Open the text file that is used for the jobsfile
     with open(run_dir + '/jobs_files/' + jobs_fname+'.txt', 'w+') as f:
         #Loop over trajectories
@@ -57,6 +59,8 @@ def generate_jobs_files(options_dict):
                             + " {} ".format(vz))
                 
             print(exec_str, file=f)
+
+    jobs_files.append(jobs_fname+'.txt')
     
     #Also initialize the results file
     with open(run_dir + '/results/' + result_fname, 'w+') as f:
