@@ -74,7 +74,7 @@ if __name__ == "__main__":
     #Append results into file
     with open(args.run_dir + '/results/' + args.result_fname, 'a') as f:
         results_list = ["{:.7e}".format(value) for value in [probability[0,0], E0[0], 
-                        E0[1], E0[2], tau_E, B0[0], B0[1], B0[2], f_B]]
+                        E0[1], E0[2], vz, B0[0], B0[1], B0[2], f_B]]
         results_str = "\t\t".join(results_list)
         print(results_str, file = f)
 
