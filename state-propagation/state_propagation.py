@@ -25,7 +25,7 @@ if __name__ == "__main__":
     parser.add_argument("Ex0", type = float)
     parser.add_argument("Ey0", type = float)
     parser.add_argument("Ez0", type = float)
-    parser.add_argument("tau_E", type = float)
+    parser.add_argument("vz", type = float)
     parser.add_argument("Bx0", type = float)
     parser.add_argument("By0", type = float)
     parser.add_argument("Bz0", type = float)
@@ -46,7 +46,9 @@ if __name__ == "__main__":
     #Make arrays of E- and B-field parameters
     E0 = np.array((args.Ex0,args.Ey0,args.Ez0))
     B0 = np.array((args.Bx0,args.By0,args.Bz0))
-    tau_E = args.tau_E
+    l_lens = 20e-3 #Rise time E-field of lens electric field
+    vz = args.vz
+    tau_E = l_lens/vz
     f_B = args.f_B
     
     #Generate list of quantum numbers
