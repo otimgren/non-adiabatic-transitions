@@ -335,6 +335,9 @@ def get_B_field(options_dict):
     #Get earth field from options dictionary
     B_earth = np.array(options_dict["B_earth"])
     
+    #Check if B-field is supposed to be canceled
+    cancel_B_field = options_dict["cancel_B_field"]
+
     #Get position of B-field zeros from options dictionary
     pos_f = options_dict["B0_pos"]
     
@@ -350,14 +353,20 @@ def get_B_field(options_dict):
     z1_0 = r_B0_1[2]
     z2_0 = r_B0_2[2]
 
+
+    #get B-field due to coils as a function of position
     B_poly = lambda r: np.array(((poly_gauss(r[2]-z1_0,-2.93758956, 0.93659248,0.49445160)
                                     +poly_gauss(r[2]-z2_0,-2.93758956, 0.93659248,0.49445160)),
                                 (poly_gauss(r[2]-z1_0,-6.95225620, 3.9847e-04,0.25704185)
                                     +poly_gauss(r[2]-z2_0,-6.95225620, 3.9847e-04,0.25704185)),
                                 (poly_gauss(r[2]-z1_0,-4.40958415, 20.8698396,0.35204689)
                                     +poly_gauss(r[2]-z2_0,-4.40958415, 20.8698396,0.35204689))))
-                                
-    B_field = lambda r: B_earth*(1-B_poly(r)/B_poly(r_B0_1))                            
+
+    if cancel_B_field:                            
+        B_field = lambda r: B_earth*(1-B_poly(r)/B_poly(r_B0_1))     
+
+    else:
+        B_field = lambda r: B_earth                  
     
     #Return the function B_t
     return B_field
