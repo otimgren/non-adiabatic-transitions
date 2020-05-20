@@ -296,10 +296,36 @@ def E_field_ring(x,z0 = 0, V = 2e4, R = 2.25*0.0254):
     #Return the electric field as an array which only has a z-component (approximation)
     return np.array((0,0,mag_E))/100
 
+def E_field_state_prep2(x, E0 = 60, k=100, l = 0.025,z1 = -.1):
+    """
+    Function that calculates the electric field due to the 2nd state preparation region 
+    at position x.
+
+    inputs:
+    x = position of molecule in m
+    E0 = Value of electric field at center of SP2 (V/cm)
+    k = gradient of electric field magnitude (V/cm/m)
+    l = rise-length (decay length) of SP2 electric field (m)
+
+    outputs:
+    E = vector desecribing electric field due to SP2
+    """
+    z2 = z1+.2
+    E = np.array((0,0,0.5*(E0+k*x[2])*(np.tanh((x[2]-z1)/l)-np.tanh((x[2]-z2)/l))))
+
+    return E
+
+
+
+
 def get_E_field(options_dict):
     """
     Function that generates the electric field due to the lens and rings
     as a function of position based on an options dictionary. 
+
+    returns:
+    E_field =   lambda function that returns electric field vector (V/cm) as function of 
+                position (m)
     """
     #Get parameters that define the electric field from the options dictionary
     lens_z0 = 0.6/2 + 0.25
@@ -309,14 +335,18 @@ def get_E_field(options_dict):
     ring1_z0 = options_dict["ring_1"]["z0"]
     V2 = options_dict["ring_2"]["V"]
     ring2_z0 = options_dict["ring_2"]["z0"]
+
+    #Parameters for ring before SP2
+    dz = options_dict["ring_3"]["dz"]
+    z0_SP2 = lens_z0+lens_L/2 + dz
+    V_SP2 = options_dict["ring_3"]["V"]
     
     #Make a function that gives the electric field as a function of position
     E_field = lambda x: (E_field_ring(x, z0 = ring1_z0, V = V1) 
-                            + E_field_ring(x, z0 = ring2_z0, V = V2)
+                         + E_field_ring(x, z0 = ring2_z0, V = V2)
                          + E_field_lens(x, z0 = lens_z0, l = lens_l)
                          + lens_Ez(x, lens_z0, lens_L)
-                        + E_field_ring(x, z0 = 2*lens_z0 - ring2_z0, V = -V2)
-                        + E_field_ring(x, z0 = 2*lens_z0 - ring1_z0, V = -V1))
+                         + E_field_ring(x, z0 = z0_SP2, V = -V_SP2))
     
     return E_field
 
