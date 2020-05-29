@@ -107,7 +107,8 @@ class CoupledBasisState:
             for mJ in mJs:
                 for m1 in m1s:
                     for m2 in m2s:
-                        amp = CG(J, mJ, I1, m1, F1, mF1).doit()*CG(F1, mF1, I2, m2, F, mF).doit()
+                        amp = (complex(CG(J, mJ, I1, m1, F1, mF1).doit()
+                                *CG(F1, mF1, I2, m2, F, mF).doit()))
                         basis_state = UncoupledBasisState(J, mJ, I1, m1, I2, m2)
                         uncoupled_state = uncoupled_state + State([(amp, basis_state)])
         
@@ -330,9 +331,11 @@ class State:
     
     
     #Function that displays the state as a sum of the basis states
-    def print_state(self, tol = 0.1):
+    def print_state(self, tol = 0.1, probabilities = False):
          for amp, basis_state in self.data:
             if np.abs(amp) > tol:
+                if probabilities:
+                    amp = np.abs(amp)**2
                 if np.real(complex(amp))>0: print('+', end ="")
                 if basis_state.isCoupled:
                     F = rat(basis_state.F)
@@ -357,7 +360,7 @@ class State:
     #Function that returns state vector in uncoupled basis  
     def state_vector(self,QN):
         state_vector = [self @ State([(1,state)]) for state in QN]
-        return np.array(state_vector,dtype = float)
+        return np.array(state_vector,dtype = complex)
     
     #Method that removes components that are smaller than tolerance from the state   
     def remove_small_components(self, tol = 1e-3):

@@ -10,7 +10,6 @@ the molecular beam source in CeNTREX.
 """
 
 #Import packages
-import h5py
 import numpy as np
 from tqdm import tqdm_notebook
 import glob

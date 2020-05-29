@@ -81,7 +81,7 @@ def propagate_state_var_dt(lens_state_vec, H, QN, B, E, T, save_fields=False):
         D, V = np.linalg.eigh(H_i)
         
         #Propagate the state vector        
-        psi = V @ np.diag(np.exp(-1j*2*np.pi*D*dt)) @ np.conj(V.T) @ psi
+        psi = V @ np.diag(np.exp(-1j*D*dt)) @ np.conj(V.T) @ psi
     
 
     #Determine which eigenstate of the Hamiltonian corresponds to the lens state
@@ -175,7 +175,7 @@ def propagate_state(lens_state_vec, H, QN, B, E, T, N_steps, save_fields=False):
             D, V = np.linalg.eigh(H_i)
         
         #Propagate the state vector        
-        psi = V @ np.diag(np.exp(-1j*2*np.pi*D*dt)) @ np.conj(V.T) @ psi
+        psi = V @ np.diag(np.exp(-1j*D*dt)) @ np.conj(V.T) @ psi
         
         #If fields are saved, add to array
         if save_fields:
