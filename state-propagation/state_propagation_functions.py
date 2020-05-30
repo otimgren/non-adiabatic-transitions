@@ -137,7 +137,7 @@ def propagate_state(lens_state_vec, H, QN, B, E, T, N_steps, save_fields=False):
     index_ini = find_state_idx(lens_state_vec, evecs0, n=1)
     
     #Find the exact state vector of the initial state
-    initial_state_vec = evecs0[:,index_ini[0]:index_ini[0]+1]
+    initial_state_vec = evecs0[:,index_ini:index_ini+1]
     
     #Define initial state
     psi = initial_state_vec
@@ -194,7 +194,7 @@ def propagate_state(lens_state_vec, H, QN, B, E, T, N_steps, save_fields=False):
     
     #Find the exact state vector that corresponds to the lens state in the given
     #E and B field
-    final_state_vec = evecsT[:,index_fin[0]:index_fin[0]+1]
+    final_state_vec = evecsT[:,index_fin:index_fin+1]
     
     #Calculate overlap between the initial and final state vector
     overlap = np.dot(np.conj(psi).T,final_state_vec)
